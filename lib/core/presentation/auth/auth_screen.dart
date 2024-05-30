@@ -1,169 +1,87 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
 import 'package:instafake_flutter/utils/enums/entry_state.dart';
-import 'package:instafake_flutter/widgets/custom_card_widget.dart';
-import 'package:instafake_flutter/widgets/custom_text_field.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:instafake_flutter/widgets/entry_form.dart';
 import 'package:provider/provider.dart';
 
 class AuthScreen extends StatelessWidget {
   AuthScreen({super.key});
 
   final TextEditingController nameEditingController = TextEditingController();
+  final TextEditingController usernameEditingController = TextEditingController();
   final TextEditingController emailEditController = TextEditingController();
   final TextEditingController emailConfirmEditController = TextEditingController();
   final TextEditingController passwordEditController = TextEditingController();
   final TextEditingController passwordConfirmController = TextEditingController();
   
-
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: Stack(
         children: [
+
+          Align(
+            alignment: const AlignmentDirectional(0, -0.6),
+            child: Text(
+              "Instafake",
+              style: TextStyle(
+                fontSize: 72,
+                fontWeight: FontWeight.w300,
+                color: colorScheme.primary
+              ),
+            ),
+          ),
           Align(
             alignment: const AlignmentDirectional(0, 0.6),
-            child: switchState(context.watch<AuthProvider>().state, context),
+            child: EntryForm(
+              usernameEditingController: usernameEditingController,
+              nameEditingController: nameEditingController,
+              emailEditController: emailEditController, 
+              emailConfirmEditController: emailConfirmEditController,
+              passwordEditController: passwordEditController,
+              passwordConfirmController: passwordConfirmController,
+              state: context.watch<AuthProvider>().state,
+              context: context,
+            ),
           )
         ],
       ),
-    );
-  }
-
-  Widget switchState(EntryState state, BuildContext context){
-    switch(state){
-      case EntryState.register:
-        return CustomCardWidget(
-          child: ListView(
-            padding: const EdgeInsets.all(0),
-            shrinkWrap: true,
-            children: [
-              CustomTextField(
-                labelText: "Name",
-                controller: nameEditingController,
-              ),
-              CustomTextField(
-                labelText: "Email",
-                controller: emailEditController,
-              ),
-              CustomTextField(
-                labelText: "Confirm Email",
-                controller: emailConfirmEditController,
-                onChanged: (text) {
-                  if (text != emailEditController.text) {
-                    context.watch<AuthProvider>().changeEmailErrorNotifierValue(newError: "Emails do not match");
-                  } else {
-                    context.watch<AuthProvider>().changeEmailErrorNotifierValue(newError: null);
-                  }
-                },
-                errorNotifier: context.watch<AuthProvider>().emailErrorNotifier,
-              ),
-              CustomTextField(
-                labelText: "Password",
-                controller: passwordEditController,
-                obscureText: true,
-              ),
-              CustomTextField(
-                labelText: "Confirm Password",
-                controller: passwordConfirmController,
-                onChanged: (text) {
-                  if (text != passwordEditController.text) {
-                    context.watch<AuthProvider>().changePasswordErrorNotifierValue(newError: "Passwords do not match");
-                  } else {
-                    context.watch<AuthProvider>().changePasswordErrorNotifierValue(newError: null);
-                  }
-                },
-                errorNotifier: context.watch<AuthProvider>().passwordErrorNotifier,
-              ),
-              ElevatedButton(
-                onPressed: () => context.watch<AuthProvider>().commitEmailRegistration(),
-                child: const Text('Register'),
-              ),
-              TextButton(
-                onPressed: () {
-                  context.watch<AuthProvider>().changeEntryState(newEntryState: EntryState.login);
-                },
-                child: Text(
-                  "Or login with Email.",
-                  style: TextStyle(
-                    color: Get.theme.colorScheme.surface,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Consumer<AuthProvider>(
+          builder: (BuildContext context, AuthProvider value, Widget? child) { 
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () => value.changeEntryState(newEntryState: EntryState.login),
+                  child: Text(
+                    "Login",
+                    style: TextStyle(
+                      color: value.state==EntryState.login? colorScheme.primaryContainer : colorScheme.onSurface,
+                      fontWeight: value.state==EntryState.login?FontWeight.bold:FontWeight.normal,
+                      fontSize: value.state==EntryState.login?16:14
+                    )
                   ),
                 ),
-              ),
-            ],
-          )
-        );
-      case EntryState.login:
-        return CustomCardWidget(
-          child: ListView(
-            padding: const EdgeInsets.all(0),
-            shrinkWrap: true,
-            children: [
-              CustomTextField(
-                labelText: "Email",
-                controller: emailEditController
-              ),
-              CustomTextField(
-                labelText: "Password",
-                controller: passwordEditController,
-                obscureText: true,
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextButton(
-                      onPressed: (){
-                        context.watch<AuthProvider>().changeEntryState(newEntryState: EntryState.login);
-                      }, 
-                      child: Row(
-                        children: [
-                          Icon(LucideIcons.chevronLeft, color: Get.theme.colorScheme.surface,),
-                          Text(
-                            "Back to Google Login",
-                            style: TextStyle(
-                              color: Get.theme.colorScheme.surface,
-                            ),
-                          ),
-                        ],
-                      )
-                    ),
+                ElevatedButton(
+                  onPressed: () => value.changeEntryState(newEntryState: EntryState.register),
+                  child: Text(
+                    "Register",
+                    style: TextStyle(
+                      color: value.state==EntryState.register? colorScheme.primaryContainer : colorScheme.onSurface,
+                      fontWeight: value.state==EntryState.register?FontWeight.bold:FontWeight.normal,
+                      fontSize: value.state==EntryState.register?16:14
+                    )
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: ElevatedButton(
-                      onPressed: ()=>context.watch<AuthProvider>().commitEmailLogin(),
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: Get.theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              TextButton(
-                onPressed: (){
-                  context.watch<AuthProvider>().changeEntryState(newEntryState: EntryState.register);
-                }, 
-                child: Text(
-                  "Don't have an account? Register here.",
-                  style: TextStyle(
-                    color: Get.theme.colorScheme.surface,
-                  ),
-                )
-              )
-            ],
-          ),
-        );
-      default:
-        return const Text('Error');
-    }
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }
+

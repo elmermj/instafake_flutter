@@ -8,14 +8,14 @@ class BottomNavBar extends StatelessWidget {
   final List<BottomNavigationBarItem> items;
   final int index;
 
-  BottomNavBar({super.key, required this.items, required this.index});
+  const BottomNavBar({super.key, required this.items, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: Get.width,
       height: kBottomNavigationBarHeight,
-      child: context.watch<ConnectivityProvider>().status == ConnectivityStatus.Connected
+      child: context.watch<ConnectivityProvider>().status == ConnectivityStatus.connected
       ? BottomNavigationBar(
           items: items,
         )
@@ -26,7 +26,7 @@ class BottomNavBar extends StatelessWidget {
             ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 500),
-              height: context.watch<ConnectivityProvider>().status == ConnectivityStatus.Connected? 0 : 20, 
+              height: context.watch<ConnectivityProvider>().status == ConnectivityStatus.connected? 0 : 20, 
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(0, 1),

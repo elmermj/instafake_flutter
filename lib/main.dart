@@ -2,25 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:instafake_flutter/core/presentation/auth/auth_screen.dart';
+import 'package:instafake_flutter/core/presentation/home/home_timeline_screen.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
+import 'package:instafake_flutter/dependency_injection.dart';
 import 'package:instafake_flutter/services/connectivity_service.dart';
+import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/theme.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const InstafakeApp());
+Future<void> main() async {
+
+  await DependencyInjection.init();
+  UserDataService userService = Get.find<UserDataService>();
+  bool isLogin = false;
+  if(userService.userModel!=null){
+    isLogin = true;
+  }
+  runApp(InstafakeApp(isLogin: isLogin));
 }
 
 class InstafakeApp extends StatelessWidget {
-  const InstafakeApp({super.key});
+  final bool isLogin;
+  const InstafakeApp({super.key, required this.isLogin});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context)=>AuthProvider(),
+          create: (context)=>AuthProvider(Get.find()),
         ),
         
         ChangeNotifierProvider(
@@ -140,7 +150,7 @@ class InstafakeApp extends StatelessWidget {
           ),
         )
       ).dark(),
-        home: AuthScreen(),
+        home: isLogin? HomeTimelineScreen() : AuthScreen(),
       ),
     );
   }

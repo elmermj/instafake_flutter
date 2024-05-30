@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:instafake_flutter/core/data/models/user_model.dart';
+import 'package:instafake_flutter/core/domain/repos/user_model_repositories.dart';
+import 'package:instafake_flutter/core/domain/usecases/login_usecase.dart';
+import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/enums/entry_state.dart';
 
 class AuthProvider extends ChangeNotifier {
-
-  String username;
-
-  EntryState state = EntryState.register;
-
-  AuthProvider({this.username = "Mapp"});
+  final UserModelRepository userModelRepository;
+  EntryState state = EntryState.login;
+  UserModel? user;
+  AuthProvider(this.userModelRepository);
   
   ValueNotifier<String?> emailErrorNotifier = ValueNotifier<String?>(null);
   ValueNotifier<String?> passwordErrorNotifier = ValueNotifier<String?>(null);
@@ -23,7 +26,6 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void changeUsername({required String newUsername}) async {
-    username = newUsername;
     notifyListeners();
   }
 
@@ -32,7 +34,23 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  commitEmailRegistration() {}
+  commitEmailRegistration(){}
 
-  commitEmailLogin() {}
+  commitEmailLogin({required String username, required String password}) async {
+    var result = await LoginUseCase(userModelRepository).login(username, password);
+    result.fold(
+      (result){
+        Get.snackbar('Login Failed', result.toString());
+      },
+      (result){
+        Get.snackbar('Login Success', 'Logged in successfully');
+        Get.find<UserDataService>().userModel = result;
+      }
+    );
+
+  }
+
+  getMetadata(){
+
+  }
 }

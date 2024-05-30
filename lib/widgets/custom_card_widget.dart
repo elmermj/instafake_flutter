@@ -7,6 +7,8 @@ class CustomCardWidget extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    //get context height
+    
     return Container(
       constraints: BoxConstraints(
         maxWidth: Get.width * 0.8,

@@ -35,7 +35,7 @@ class CustomTextField extends StatelessWidget {
             obscureText: obscureText,
             controller: controller,
             style: TextStyle(
-              color: color ?? context.watch(),
+              color: color ?? Get.theme.colorScheme.surface,
             ),
             minLines: 1,
             maxLines: maxLines ?? 1,
