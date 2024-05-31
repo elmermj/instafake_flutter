@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:instafake_flutter/core/presentation/auth/auth_screen.dart';
-import 'package:instafake_flutter/core/presentation/home/home_timeline_screen.dart';
+import 'package:instafake_flutter/core/presentation/home/home_screen.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
-import 'package:instafake_flutter/core/providers/timeline_provider.dart';
+import 'package:instafake_flutter/core/providers/home_provider.dart';
 import 'package:instafake_flutter/dependency_injection.dart';
 import 'package:instafake_flutter/services/connectivity_service.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
@@ -16,9 +17,16 @@ Future<void> main() async {
   await DependencyInjection.init();
   UserDataService userService = Get.find<UserDataService>();
   bool isLogin = false;
-  if(userService.userModel!=null){
+  
+  if(DependencyInjection.isJwtExpired(userService.userModel==null? '' : userService.userModel!.token)){
+    isLogin = false;
+  }else {
     isLogin = true;
   }
+  
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(InstafakeApp(isLogin: isLogin));
 }
 
@@ -39,7 +47,7 @@ class InstafakeApp extends StatelessWidget {
         ),
 
         ChangeNotifierProvider(
-          create: (context)=>PostProvider(postModelRepository: Get.find()),
+          create: (context)=>HomeProvider(postModelRepository: Get.find()),
         )
       ],
       child: GetMaterialApp(
@@ -155,7 +163,7 @@ class InstafakeApp extends StatelessWidget {
           ),
         )
       ).dark(),
-        home: isLogin? HomeTimelineScreen() : AuthScreen(),
+        home: isLogin? HomeScreen() : AuthScreen(),
       ),
     );
   }

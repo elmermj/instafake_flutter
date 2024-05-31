@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:instafake_flutter/core/data/models/post_model.dart';
+import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
+import 'package:instafake_flutter/utils/constants.dart';
 import 'package:instafake_flutter/utils/log.dart';
 
 class RemotePostModelDataSource {
@@ -31,21 +33,23 @@ class RemotePostModelDataSource {
     }
   }
 
-  Future<List<PostModel>> getExplore(int page, int pageSize) async {
-    final response = await _httpClient.get(Uri.parse('$_baseUrl/explore?page=$page&pageSize=$pageSize'), headers: {
-      'Authorization': _token,
-    });
+  Future<List<PostThumbnailModel>> getExplore(int page, int pageSize) async {
+    String requestURL = '${_baseUrl}api/posts/explore?page=$page&size=$pageSize';
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));
+    Log.yellow("GET EXPLORE STATUS CODE  ::: ${response.statusCode}");
+    Log.yellow("GET EXPLORE RESPONSE BODY  ::: ${response.body}");
     if (response.statusCode == 200) {
-      return PostModel.fromJsonList(jsonDecode(response.body));
+      return PostThumbnailModel.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to get explore');
     }
   }
 
   Future<List<PostModel>> getTimeline(String username, int page, int pageSize) async {
-    final response = await _httpClient.get(Uri.parse('$_baseUrl/$username/timeline?page=$page&pageSize=$pageSize'), headers: {
-      'Authorization': _token,
-    });
+    String requestURL = '${_baseUrl}api/posts/$username/timeline?page=$page&size=$pageSize';
+    Log.yellow('Get timeline Auth Token : $_token');
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));
+    Log.yellow('Get timeline response (DS) [${response.statusCode}]: ${response.body}');
     if (response.statusCode == 200) {
       return PostModel.fromJsonList(jsonDecode(response.body));
     } else {

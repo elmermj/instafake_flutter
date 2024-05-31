@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:instafake_flutter/core/data/models/post_model.dart';
+import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
 import 'package:instafake_flutter/core/data/sources/local_post_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/remote_post_model_data_source.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
@@ -9,7 +10,7 @@ import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
 abstract class PostModelRepository {
   Future<Either<Exception, void>> createPost(CreatePostRequest creatPostRequest, File file);
   Future<Either<Exception, PostModel>> getPost(int postId);
-  Future<Either<Exception, List<PostModel>>> getExplore(int page, int pageSize);
+  Future<Either<Exception, List<PostThumbnailModel>>> getExplore(int page, int pageSize);
   Future<Either<Exception, List<PostModel>>> getTimeline(String username, int page, int pageSize);
   Future<void> deletePost(int postId);
 }
@@ -37,12 +38,12 @@ class PostModelRepositoryImpl implements PostModelRepository {
   }
   
   @override
-  Future<Either<Exception, List<PostModel>>> getExplore(int page, int pageSize) async {
+  Future<Either<Exception, List<PostThumbnailModel>>> getExplore(int page, int pageSize) async {
     try {
-      List<PostModel> explore = await _remoteDataSource.getExplore(page, pageSize).then((value) {
+      List<PostThumbnailModel> explore = await _remoteDataSource.getExplore(page, pageSize).then((value) {
         if (value.isNotEmpty) {
           for (var post in value) {
-            _localDataSource.savePostMetadata(post, post.id);
+            _localDataSource.savePostThumbnailMetadata(post, post.postId);
           }
           return value;        
         }

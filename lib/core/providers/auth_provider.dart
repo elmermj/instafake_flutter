@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/domain/repos/user_model_repository.dart';
 import 'package:instafake_flutter/core/domain/usecases/login_usecase.dart';
+import 'package:instafake_flutter/core/presentation/home/home_screen.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/enums/entry_state.dart';
 
@@ -45,6 +46,7 @@ class AuthProvider extends ChangeNotifier {
       (result){
         Get.snackbar('Login Success', 'Logged in successfully');
         Get.find<UserDataService>().userModel = result;
+        Get.off(()=>HomeScreen());
       }
     );
 

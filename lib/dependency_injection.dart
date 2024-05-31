@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:instafake_flutter/core/data/models/post_model.dart';
+import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/data/sources/local_post_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/local_user_model_data_source.dart';
@@ -14,6 +15,7 @@ import 'package:instafake_flutter/services/account_service.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:instafake_flutter/utils/log.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'utils/constants.dart';
@@ -42,8 +44,10 @@ class DependencyInjection {
     await Hive.initFlutter();
     Hive.registerAdapter(UserModelAdapter());
     Hive.registerAdapter(PostModelAdapter());
+    Hive.registerAdapter(PostThumbnailModelAdapter());
     final userBox = await Hive.openBox<UserModel>(METADATA_KEY);
     final postsBox = await Hive.openBox<PostModel>(POST_KEY);
+    final postThumbnailsBox = await Hive.openBox<PostThumbnailModel>(POST_THUMBNAILS_KEY);
     final mediasBox = await Hive.openBox<File>(MEDIA_KEY);
 
     http.Client client = http.Client();
@@ -52,12 +56,13 @@ class DependencyInjection {
     Get.put<RemoteUserModelDataSource>(RemoteUserModelDataSource(client));
     Get.put<RemotePostModelDataSource>(RemotePostModelDataSource(client, SERVER_URL, userBox.get(METADATA_KEY)?.token ?? ''));
     Get.put<LocalUserModelDataSource>(LocalUserModelDataSource(userBox));
-    Get.put<LocalPostModelDataSource>(LocalPostModelDataSource(postsBox));
+    Get.put<LocalPostModelDataSource>(LocalPostModelDataSource(postsBox, postThumbnailsBox));
 
     //storage intances
     Get.put(userBox);
     Get.put(postsBox);
     Get.put(mediasBox);
+    Get.put(postThumbnailsBox);
 
     //service instances
     Get.put(UserDataService(userBox));
@@ -95,4 +100,13 @@ class DependencyInjection {
       box.deleteAll(box.keys.toList().sublist(0, box.length - 50));
     }
   }
+
+  static bool isJwtExpired(String token) {
+    if(token.isEmpty) return true;
+
+    bool isExpired = JwtDecoder.isExpired(token);
+    Log.yellow(isExpired.toString());
+    return isExpired;
+  }
+
 }

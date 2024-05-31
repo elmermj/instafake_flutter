@@ -25,7 +25,7 @@ class UserModelRepositoryImpl extends UserModelRepository{
       final metadata = response['metadata'];
       Log.yellow("Metadata : ${metadata.toString()}");
       Log.yellow("Username : ${metadata['username']}");
-      Log.yellow("Created At : ${metadata['created_at'].toString()}");
+      Log.yellow("Created At : ${metadata['createdAt'].toString()}");
       final authResponse = UserModel(
         id: metadata['id'], 
         token: response['token'], 
@@ -33,7 +33,7 @@ class UserModelRepositoryImpl extends UserModelRepository{
         realname: metadata['realname'], 
         email: metadata['email'], 
         // createdAt: DateFormat("yyyyMMddHHmmss").parse(metadata['created_at'])
-        createdAt: DateTime.parse(metadata['created_at']),
+        createdAt: DateTime.parse(metadata['createdAt']),
       );
       await _localDataSource.saveUserMetadata(authResponse);
       return Right(authResponse);
