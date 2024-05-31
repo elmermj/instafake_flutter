@@ -4,7 +4,11 @@ const SERVER_URL = "http://10.200.20.80:8080/";
 
 const METADATA_KEY = 'metadata';
 
-DEFAULT_HEADER(String token){
+const POST_KEY = 'posts';
+
+const MEDIA_KEY = 'medias';
+
+Map<String, String> DEFAULT_HEADER(String token){
   return {
     'Authorization': 'Bearer $token',
   };

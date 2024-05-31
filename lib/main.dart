@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:instafake_flutter/core/presentation/auth/auth_screen.dart';
 import 'package:instafake_flutter/core/presentation/home/home_timeline_screen.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
+import 'package:instafake_flutter/core/providers/timeline_provider.dart';
 import 'package:instafake_flutter/dependency_injection.dart';
 import 'package:instafake_flutter/services/connectivity_service.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
@@ -30,11 +31,15 @@ class InstafakeApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context)=>AuthProvider(Get.find()),
+          create: (context)=>AuthProvider(userModelRepository:  Get.find()),
         ),
         
         ChangeNotifierProvider(
           create: (context)=>ConnectivityProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (context)=>PostProvider(postModelRepository: Get.find()),
         )
       ],
       child: GetMaterialApp(
