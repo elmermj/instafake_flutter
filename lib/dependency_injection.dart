@@ -1,15 +1,20 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:instafake_flutter/core/data/models/comment_model.dart';
 import 'package:instafake_flutter/core/data/models/post_model.dart';
 import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
+import 'package:instafake_flutter/core/data/models/suggestion_model.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/data/sources/local_post_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/local_user_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/remote_post_model_data_source.dart';
+import 'package:instafake_flutter/core/data/sources/remote_story_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/remote_user_model_data_source.dart';
 import 'package:instafake_flutter/core/domain/repos/post_model_repository.dart';
+import 'package:instafake_flutter/core/domain/repos/story_model_repository.dart';
 import 'package:instafake_flutter/core/domain/repos/user_model_repository.dart';
 import 'package:instafake_flutter/services/account_service.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
@@ -45,28 +50,33 @@ class DependencyInjection {
     Hive.registerAdapter(UserModelAdapter());
     Hive.registerAdapter(PostModelAdapter());
     Hive.registerAdapter(PostThumbnailModelAdapter());
+    Hive.registerAdapter(SuggestionModelAdapter());
+    Hive.registerAdapter(CommentModelAdapter());
     final userBox = await Hive.openBox<UserModel>(METADATA_KEY);
     final postsBox = await Hive.openBox<PostModel>(POST_KEY);
     final postThumbnailsBox = await Hive.openBox<PostThumbnailModel>(POST_THUMBNAILS_KEY);
-    final mediasBox = await Hive.openBox<File>(MEDIA_KEY);
+    final searchSuggestionsBox = await Hive.openBox<SuggestionModel>(SEARCH_SUGGESTIONS_KEY);
+    final commentsBox = await Hive.openBox<SuggestionModel>(COMMENTS_KEY);
 
     http.Client client = http.Client();
-
+    String token = userBox.get(METADATA_KEY)?.token ?? '';
     //Data Source intances
-    Get.put<RemoteUserModelDataSource>(RemoteUserModelDataSource(client));
-    Get.put<RemotePostModelDataSource>(RemotePostModelDataSource(client, SERVER_URL, userBox.get(METADATA_KEY)?.token ?? ''));
-    Get.put<LocalUserModelDataSource>(LocalUserModelDataSource(userBox));
-    Get.put<LocalPostModelDataSource>(LocalPostModelDataSource(postsBox, postThumbnailsBox));
+    Get.put<RemoteUserModelDataSource>(RemoteUserModelDataSource(client, token));
+    Get.put<RemoteStoryModelDataSource>(RemoteStoryModelDataSource(token, client));
+    Get.put<RemotePostModelDataSource>(RemotePostModelDataSource(client, SERVER_URL, token));
+    Get.put<LocalUserModelDataSource>(LocalUserModelDataSource(userBox, searchSuggestionsBox));
+    Get.put<LocalPostModelDataSource>(LocalPostModelDataSource(postsBox, postThumbnailsBox, client));
 
     //storage intances
     Get.put(userBox);
     Get.put(postsBox);
-    Get.put(mediasBox);
     Get.put(postThumbnailsBox);
+    Get.put(searchSuggestionsBox);
+    Get.put(commentsBox);
 
     //service instances
     Get.put(UserDataService(userBox));
-    AccountService accountService = Get.put(AccountService());
+    DeviceStatusService accountService = Get.put(DeviceStatusService());
 
     //repository instances
     Get.put<UserModelRepository>(
@@ -83,22 +93,78 @@ class DependencyInjection {
       )
     );
 
+    Get.put<StoryModelRepository>(
+      StoryModelRepositoryImple(remoteDataSource: Get.find())
+    );
 
-    PermissionStatus status = await Permission.storage.request();
-    if (status.isGranted) {
-      accountService.permissionGranted.value = true;
-      Log.green("Storage permission granted.");
-    } else {
-      accountService.permissionGranted.value = false;
-      Log.red("Storage permission denied.");
-    }
+    await requestPermissions(accountService);
+
   }
 
-  static autoCleanCachedData<T>(Box<T> box, int retain){
-    if(box.length >= 50){
-      //retain only the last 50 items
-      box.deleteAll(box.keys.toList().sublist(0, box.length - 50));
+  static requestPermissions(DeviceStatusService accountService) async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if(Platform.isAndroid){
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      int apiLevel = androidInfo.version.sdkInt;
+      if(apiLevel >= 33){
+        PermissionStatus storageStatus = await Permission.manageExternalStorage.request();
+        PermissionStatus photosStatus = await Permission.photos.request();
+        PermissionStatus cameraStatus = await Permission.camera.request();
+        PermissionStatus videoStatus = await Permission.videos.request();
+        PermissionStatus audioStatus = await Permission.audio.request();
+        PermissionStatus mediaStatus = await Permission.mediaLibrary.request();
+        PermissionStatus microphoneStatus = await Permission.microphone.request();
+
+        if(
+          storageStatus.isDenied &&
+          photosStatus.isDenied &&
+          cameraStatus.isDenied &&
+          videoStatus.isDenied &&
+          audioStatus.isDenied &&
+          mediaStatus.isDenied &&
+          microphoneStatus.isDenied
+        ){
+          accountService.permissionsGranted.value = false;
+        }else {
+          accountService.permissionsGranted.value = true;
+        }
+
+      } else {
+        PermissionStatus externalStorageStatus = await Permission.manageExternalStorage.request();
+        PermissionStatus storageStatus = await Permission.storage.request();
+        PermissionStatus microphoneStatus = await Permission.microphone.request();
+        PermissionStatus cameraStatus = await Permission.camera.request();
+
+        if(
+          externalStorageStatus.isDenied && 
+          storageStatus.isDenied &&
+          microphoneStatus.isDenied &&
+          cameraStatus.isDenied
+        ){
+          accountService.permissionsGranted.value = false;
+        }else {
+          accountService.permissionsGranted.value = true;
+        }
+      }
     }
+
+    // Not tested on IOS
+    // if(Platform.isIOS){
+    //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    //   if(iosInfo.systemVersion. >= '14.0'){
+    //     PermissionStatus photosStatus = await Permission.photos.request();
+    //     PermissionStatus cameraStatus = await Permission.camera.request();
+    //     PermissionStatus videoStatus = await Permission.videos.request();
+    //     PermissionStatus microphoneStatus = await Permission.microphone.request();
+    //   } else {
+    //     PermissionStatus storageStatus = await Permission.storage.request();
+    //     PermissionStatus microphoneStatus = await Permission.microphone.request();
+    //   }
+    // }
+  }
+
+  static autoCleanCachedMedias<T>(){
+
   }
 
   static bool isJwtExpired(String token) {

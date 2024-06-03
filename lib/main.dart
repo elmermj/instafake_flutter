@@ -6,7 +6,10 @@ import 'package:instafake_flutter/core/presentation/auth/auth_screen.dart';
 import 'package:instafake_flutter/core/presentation/home/home_screen.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
 import 'package:instafake_flutter/core/providers/home_provider.dart';
+import 'package:instafake_flutter/core/providers/camera_provider.dart';
+import 'package:instafake_flutter/core/providers/profile_provider.dart';
 import 'package:instafake_flutter/dependency_injection.dart';
+import 'package:instafake_flutter/services/account_service.dart';
 import 'package:instafake_flutter/services/connectivity_service.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/theme.dart';
@@ -32,7 +35,9 @@ Future<void> main() async {
 
 class InstafakeApp extends StatelessWidget {
   final bool isLogin;
-  const InstafakeApp({super.key, required this.isLogin});
+  InstafakeApp({super.key, required this.isLogin});
+
+  final DeviceStatusService accountService = Get.find<DeviceStatusService>();
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +52,24 @@ class InstafakeApp extends StatelessWidget {
         ),
 
         ChangeNotifierProvider(
-          create: (context)=>HomeProvider(postModelRepository: Get.find()),
+          create: (context)=>HomeProvider(
+            postModelRepository: Get.find(), 
+            storyModelRepository: Get.find(),
+            userModelRepository: Get.find()),
+        ),
+
+        ChangeNotifierProvider(
+          create: (context)=>CameraProvider(postModelRepository: Get.find(), storyModelRepository: Get.find())
+        ),
+
+        ChangeNotifierProvider(
+          create: (context)=>ProfileProvider(userRepo: Get.find())
         )
+
       ],
       child: GetMaterialApp(
+        defaultTransition: Transition.cupertino,
+        debugShowCheckedModeBanner: false,
         theme: MaterialTheme(
         TextTheme(
           displayLarge: GoogleFonts.poppins(
@@ -163,7 +182,26 @@ class InstafakeApp extends StatelessWidget {
           ),
         )
       ).dark(),
-        home: isLogin? HomeScreen() : AuthScreen(),
+        home: 
+        accountService.permissionsGranted.value? (
+          isLogin? HomeScreen() : AuthScreen()
+        ):
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Please every permissions to use this application!', style: TextStyle(fontSize: 18),),
+              const SizedBox(height: 10,),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0
+                ),
+                onPressed: () => DependencyInjection.requestPermissions(accountService),
+                child: const Text('Allow Permissions', style: TextStyle(fontSize: 18),),
+              ),
+            ],
+          )
+        ),
       ),
     );
   }

@@ -83,7 +83,12 @@ class EntryForm extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
-                      value.commitEmailRegistration();
+                      value.commitEmailRegistration(
+                        nameEditingController.text,
+                        usernameEditingController.text,
+                        emailEditController.text,
+                        passwordEditController.text,
+                      );
                     },
                     child: const Text('Register'),
                   ),

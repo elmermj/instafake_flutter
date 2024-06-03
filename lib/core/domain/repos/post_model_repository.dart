@@ -6,6 +6,7 @@ import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
 import 'package:instafake_flutter/core/data/sources/local_post_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/remote_post_model_data_source.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
+import 'package:instafake_flutter/utils/log.dart';
 
 abstract class PostModelRepository {
   Future<Either<Exception, void>> createPost(CreatePostRequest creatPostRequest, File file);
@@ -13,6 +14,9 @@ abstract class PostModelRepository {
   Future<Either<Exception, List<PostThumbnailModel>>> getExplore(int page, int pageSize);
   Future<Either<Exception, List<PostModel>>> getTimeline(String username, int page, int pageSize);
   Future<void> deletePost(int postId);
+
+  Future<Either<Exception, PostModel>> addComment(String comment, String username, String posId);
+  Future<Either<Exception, bool>> addLike(String postId, String userId);
 }
 
 class PostModelRepositoryImpl implements PostModelRepository {
@@ -40,17 +44,18 @@ class PostModelRepositoryImpl implements PostModelRepository {
   @override
   Future<Either<Exception, List<PostThumbnailModel>>> getExplore(int page, int pageSize) async {
     try {
-      List<PostThumbnailModel> explore = await _remoteDataSource.getExplore(page, pageSize).then((value) {
-        if (value.isNotEmpty) {
-          for (var post in value) {
-            _localDataSource.savePostThumbnailMetadata(post, post.postId);
+      Log.yellow("GET EXPLORE PAGE ::: $page, PAGE SIZE ::: $pageSize");
+      List<PostThumbnailModel> explorePostThumbnails = await _remoteDataSource.getExplore(page, pageSize).then((explorePosts) {
+        if (explorePosts.isNotEmpty) {
+          for (var explorePost in explorePosts) {
+            _localDataSource.savePostThumbnailMetadata(explorePost, explorePost.postId);
           }
-          return value;        
+          return explorePosts;        
         }
         return [];
       });
-      if (explore.isNotEmpty) {
-        return Right(explore);
+      if (explorePostThumbnails.isNotEmpty) {
+        return Right(explorePostThumbnails);
       } else {
         return Left(Exception("Timeline not available"));
       }
@@ -82,6 +87,26 @@ class PostModelRepositoryImpl implements PostModelRepository {
       } else {
         return Left(Exception("Timeline not available"));
       }
+    } on Exception catch (e) {
+      return Left(Exception("Timeline failed : ${e.toString()}"));
+    }
+  }
+  
+  @override
+  Future<Either<Exception, PostModel>> addComment(String comment, String username, String posId) async {
+    try{
+      final res = await _remoteDataSource.addComment(comment, username, posId);
+      return Right(res);
+    } on Exception catch (e) {
+      return Left(Exception("Timeline failed : ${e.toString()}"));
+    }
+  }
+  
+  @override
+  Future<Either<Exception, bool>> addLike(String postId, String userId) async {
+    try{
+      final res = await _remoteDataSource.likePost(postId, userId);
+      return Right(res);
     } on Exception catch (e) {
       return Left(Exception("Timeline failed : ${e.toString()}"));
     }

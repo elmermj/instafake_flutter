@@ -7,10 +7,14 @@ class CustomLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
-    return RiveAnimation.asset(
-      'assets/animations/hexasphere_loading.riv',
-      artboard: isDarkMode? 'Hexasphere Dark' : 'Hexasphere Light',
-      fit: BoxFit.contain,
+    return SizedBox(
+      height: 45,
+      width: 45,
+      child: RiveAnimation.asset(
+        'assets/animations/hexasphere_loading.riv',
+        artboard: isDarkMode? 'Hexasphere Dark' : 'Hexasphere Light',
+        fit: BoxFit.contain,
+      ),
     );
   }
 }

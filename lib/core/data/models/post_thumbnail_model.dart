@@ -6,17 +6,17 @@ part 'post_thumbnail_model.g.dart';
 @HiveType(typeId: 2)
 class PostThumbnailModel {
   @HiveField(0)
-  final int postId;
+  int postId;
   @HiveField(1)
-  final String fileUrl;
+  String fileUrl;
   @HiveField(2)
-  final String fileName;
+  String fileName;
   @HiveField(3)
-  final String caption;
+  String caption;
   @HiveField(4)
-  final DateTime createdAt;
+  DateTime createdAt;
   @HiveField(5)
-  final int userId;
+  int userId;
 
   PostThumbnailModel({required this.postId, required this.fileUrl, required this.fileName, required this.caption, required this.createdAt, required this.userId});
 

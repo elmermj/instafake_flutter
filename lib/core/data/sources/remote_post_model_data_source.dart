@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:instafake_flutter/core/data/models/post_model.dart';
 import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
+import 'package:instafake_flutter/core/domain/dto/comment_request.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
+import 'package:instafake_flutter/core/domain/dto/like_request.dart';
 import 'package:instafake_flutter/utils/constants.dart';
 import 'package:instafake_flutter/utils/log.dart';
-
 class RemotePostModelDataSource {
   final http.Client _httpClient;
   final String _baseUrl;
@@ -16,7 +17,7 @@ class RemotePostModelDataSource {
   RemotePostModelDataSource(this._httpClient, this._baseUrl, this._token);
 
   Future<void> createPost(CreatePostRequest post, File file) async {
-    var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/create'));
+    var request = http.MultipartRequest('POST', Uri.parse('${_baseUrl}api/posts/create'));
     request.fields['username'] = post.username;
     request.fields['caption'] = post.caption;
     request.files.add(http.MultipartFile('file', file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last));
@@ -34,12 +35,14 @@ class RemotePostModelDataSource {
   }
 
   Future<List<PostThumbnailModel>> getExplore(int page, int pageSize) async {
+    Log.yellow("GET EXPLORE PAGE DS ::: $page, PAGE SIZE ::: $pageSize");
     String requestURL = '${_baseUrl}api/posts/explore?page=$page&size=$pageSize';
-    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));
-    Log.yellow("GET EXPLORE STATUS CODE  ::: ${response.statusCode}");
-    Log.yellow("GET EXPLORE RESPONSE BODY  ::: ${response.body}");
+    Log.yellow(_token);
+    Log.yellow(requestURL);
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));      
+    Log.yellow("GET EXPLORE RESPONSE BODY  ::: ${response.body} [${response.statusCode}]");
     if (response.statusCode == 200) {
-      return PostThumbnailModel.fromJsonList(jsonDecode(response.body));
+      return await PostThumbnailModel.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to get explore');
     }
@@ -49,11 +52,59 @@ class RemotePostModelDataSource {
     String requestURL = '${_baseUrl}api/posts/$username/timeline?page=$page&size=$pageSize';
     Log.yellow('Get timeline Auth Token : $_token');
     final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));
+    Log.yellow('RESPONSE 1 ::: ${response.body}');
     Log.yellow('Get timeline response (DS) [${response.statusCode}]: ${response.body}');
+    
     if (response.statusCode == 200) {
       return PostModel.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to get timeline');
+    }
+  }
+
+  Future<PostModel> addComment(String comment, String username, String posId) async {
+    String requestURL = '${_baseUrl}api/posts/$posId/comment';
+    Log.yellow('Get timeline Auth Token : $_token');
+    Log.yellow('Get requestURL : $requestURL');
+    final body = CommentRequest(comment: comment, username: username);
+    Log.yellow('Get request body : ${body.toJson()}');
+    final response = await _httpClient.post(
+      Uri.parse(requestURL), 
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': _token
+      },
+      body: jsonEncode(body.toJson())
+    );
+    Log.yellow('RESPONSE 1 ::: ${response.statusCode} ${response.body}');
+    if (response.statusCode == 200) {
+      return PostModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to add comment');
+    }
+  }
+
+  //Gotta rush this one
+  Future<bool> likePost(String postId, String userId) async {
+    String requestURL = '${_baseUrl}api/posts/$postId/like?userId=$userId';
+    Log.yellow('Get timeline Auth Token : $_token');
+    Log.yellow('Get requestURL : $requestURL');
+    Log.yellow('Get postId : $postId, userId : $userId');
+    final body = LikeRequest(postId: postId, userId: userId);
+    final response = await _httpClient.post(
+      Uri.parse(requestURL),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': _token
+      },
+      // body: jsonEncode(body.toJson())
+    );
+    Log.yellow('REQUEST 1 ::: ${jsonEncode(body.toJson())}');
+    Log.yellow('RESPONSE 1 ::: ${response.statusCode} ${response.body}');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw false;
     }
   }
 }

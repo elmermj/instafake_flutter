@@ -6,6 +6,7 @@ import 'package:instafake_flutter/core/domain/usecases/login_usecase.dart';
 import 'package:instafake_flutter/core/presentation/home/home_screen.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/enums/entry_state.dart';
+import 'package:instafake_flutter/utils/log.dart';
 
 class AuthProvider extends ChangeNotifier {
   final UserModelRepository _userModelRepository;
@@ -35,16 +36,44 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  commitEmailRegistration(){}
+  commitEmailRegistration(
+    String name,
+    String username,
+    String email,
+    String password
+  ) async {
+    try {
+      final result = await _userModelRepository.register(
+        name,
+        username.toLowerCase(),
+        email.toLowerCase(),
+        password
+      );
+
+      result.fold(
+        (l) {
+          Get.snackbar('Registration Failed', l.toString());
+        },
+        (r) {
+          Get.snackbar('Registration Success', 'Welcome, $username');
+          Get.find<UserDataService>().userModel = r;
+          Get.off(()=>HomeScreen());
+        }
+      );
+    } on Exception catch (e) {
+      Get.snackbar('Registration Failed', e.toString());
+    }
+  }
 
   commitEmailLogin({required String username, required String password}) async {
+    Log.yellow("LOGIN INITIATED");
     var result = await LoginUseCase(_userModelRepository).login(username, password);
     result.fold(
       (result){
         Get.snackbar('Login Failed', result.toString());
       },
       (result){
-        Get.snackbar('Login Success', 'Logged in successfully');
+        Get.snackbar('Login Success', 'Welcome, $username');
         Get.find<UserDataService>().userModel = result;
         Get.off(()=>HomeScreen());
       }

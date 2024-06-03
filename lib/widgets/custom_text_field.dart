@@ -1,37 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instafake_flutter/utils/log.dart';
-import 'package:provider/provider.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     required this.controller,
-    required this.labelText,
+    this.labelText,
+    this.hintText,
     this.obscureText = false,
     this.onChanged,
-    this.errorNotifier, this.keyboardType, this.color, this.prefix, this.maxLines
+    this.onSubmitted,
+    this.errorNotifier, this.keyboardType, this.color, this.prefix, this.maxLines, this.filled
   });
 
-  final String labelText;
+  final String? labelText;
+  final String? hintText;
   final TextEditingController controller;
   final bool obscureText;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
   final ValueNotifier<String?>? errorNotifier;
   final TextInputType? keyboardType;
   final Color? color;
   final Widget? prefix;
   final int? maxLines;
+  final bool? filled;
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String?>(
       valueListenable: errorNotifier ?? ValueNotifier<String?>(null),
       builder: (context, error, child) {
-        Log.red("Error: $error");
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: TextField(
+            onSubmitted: onSubmitted,
             obscureText: obscureText,
             controller: controller,
             style: TextStyle(
@@ -40,8 +44,11 @@ class CustomTextField extends StatelessWidget {
             minLines: 1,
             maxLines: maxLines ?? 1,
             decoration: InputDecoration(
+              filled: filled ?? false,
               prefix: prefix,
               labelText: labelText,
+              hintText: hintText,
+              fillColor: Get.theme.colorScheme.outlineVariant,
               labelStyle: TextStyle(
                 color: color ?? Get.theme.colorScheme.surface,
               ),

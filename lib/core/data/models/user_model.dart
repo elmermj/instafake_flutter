@@ -57,6 +57,14 @@ class UserModel extends HiveObject{
     );
   }
 
+  static Future<List<UserModel>> fromJsonList(jsonDecode) {
+    if (jsonDecode is List) {
+      return Future.value(jsonDecode.map((e) => UserModel.fromJson(e)).toList());
+    } else {
+      throw Exception('Failed to parse json list');
+    }
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
