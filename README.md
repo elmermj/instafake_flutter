@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+## WARNING
+This application has only been tested on the Android 11 platform (Galaxy A50 and S10). There are several changes regarding permissions on Android 13 and above which I'm afraid I overlooked as I haven't tested it yet on my newest Android devices. I haven't tested it on iOS as I don't have MacOS for compiling the app.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
