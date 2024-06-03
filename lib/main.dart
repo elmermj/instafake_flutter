@@ -19,7 +19,7 @@ import 'package:provider/provider.dart';
 
 
 // After several days bashing my head against the wall of my bedroom and office, bashing my keyboard from time to time, trying to make sense how to build a fully fledge        /next line
-// Instagram with a very limited time constraint -- of which I just started working on it on day 3 becase of my tight schedule -- I finally realized that I didn't need         /next line
+// Instagram with a very limited time constraint -- of which I started working on it on day 3 becase of my tight schedule -- I finally realized that I didn't need              /next line
 // to build a fully fledge Instagram clone. I literally just realized that on Friday night. All this time I spent my time working on the data persistency first, turned out     /next line
 // I wasn't required to. So if you encounter blocked codes, those are the codes that was supposed to be continued but I blocked it becuase it's impossible to build them        /next line
 // in such short notice. I spent 2 days on working with the Data Persistency, so, brace yourself because this application is made with rush.
@@ -31,7 +31,8 @@ import 'package:provider/provider.dart';
 // - avoiding any kind of repeating initialization which in my honest opinion it will slow down the application.
 // For state management, I use Provider as required. Although I still prefer GetX because of the aforementioned reasoning, maybe because I'm not really good at Provider        /next line
 // - I can learn and improve my technique once I see a source code from a complex application created fully with Provider.
-// For the sake of simplicity, I use Hive as my storage solution. It's pretty quick at loading and saving data. I know data persistence is not required, I just can't help it.  /next line
+// For the sake of reliable data persistency, I use Hive as my storage solution. It's pretty quick at loading and saving data. I know data persistence is not required,         /next line
+// - I just can't help it.
 // - I really care about quality and I want to make sure that my application will be able to run smoothly.
 // I don't have enough time to generate unit tests as I rely on manual tests for every function, method, or API I created.                                                      /next line
 // - I hope that my code is clean and understandable. I will make sure to write unit tests in the future.
