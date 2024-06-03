@@ -140,7 +140,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
                       Container(
                         width: width,
                         padding:const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(post.likeUserIds!.isEmpty? 'No one has liked this post': post.likeUserIds!.length.toString(),
+                        child: Text(post.likeUserIds!.isEmpty? 'No one has liked this post': "${post.likeUserIds!.length.toString()} likes",
                           textAlign: TextAlign.left,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold
