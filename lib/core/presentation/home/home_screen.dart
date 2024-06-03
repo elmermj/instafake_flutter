@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           : null,
         appBar: AppBar(
-          leading: Builder(
+          leading: value.index==0? Builder(
             builder: (context) {
               return IconButton(
                 onPressed: () {
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             }
-          ),
+          ):null,
           centerTitle: true,
           title: value.index == 1 || value.index == 4
             ? Container(

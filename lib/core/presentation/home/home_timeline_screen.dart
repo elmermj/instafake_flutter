@@ -199,6 +199,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: post.comments!.length,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, commentIndex) {
                             final comment = post.comments![commentIndex];
                             return Row(
@@ -221,6 +222,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
                     : SizedBox(
                         width: width,
                         child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: post.comments!.length < 2 ? 1 : 2,
                           itemBuilder: (context, commentIndex) {
