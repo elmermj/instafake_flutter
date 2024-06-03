@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:get/get.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/data/sources/local_user_model_data_source.dart';
 import 'package:instafake_flutter/core/data/sources/remote_user_model_data_source.dart';
@@ -7,7 +6,6 @@ import 'package:instafake_flutter/core/domain/dto/follow_request.dart';
 import 'package:instafake_flutter/core/domain/dto/profile_response.dart';
 import 'package:instafake_flutter/core/domain/dto/user_response.dart';
 import 'package:instafake_flutter/utils/log.dart';
-import 'package:http/http.dart' as http;
 
 abstract class UserModelRepository {
   Future<Either<Exception, UserModel>> login(String username, String password);

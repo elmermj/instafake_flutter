@@ -14,19 +14,19 @@ class ConfirmUploadPage extends StatelessWidget {
     final cameraProvider = Provider.of<CameraProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confirm Upload'),
+        title: const Text('Confirm Upload'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.file(File(imagePath)),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 await cameraProvider.uploadStory();
               },
-              child: Text('Upload'),
+              child: const Text('Upload'),
             ),
           ],
         ),

@@ -30,7 +30,8 @@ class _CameraGalleryScreenState extends State<CameraGalleryScreen> {
         title: const Text(
           'Create a post'
         ),
-        actions: cameraProvider.pageIndex ==1 ? [
+        actions: cameraProvider.pageIndex ==1 
+      ? [
           TextButton(
             onPressed: ()=>cameraProvider.createPost(), 
             child: Text(
@@ -41,29 +42,28 @@ class _CameraGalleryScreenState extends State<CameraGalleryScreen> {
               )
             )
           )
-        ]:null,
+        ]
+      : null,
       ),
       body: Column(
         children: [
-          // Preview section
           Expanded(
             child: cameraProvider.isImageLoading || cameraProvider.assets.isEmpty
-                ? const CustomLoadingWidget()
-                : FutureBuilder<File?>(
-                    future: cameraProvider.selectedFile,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CustomLoadingWidget();
-                      } else if (snapshot.hasData && snapshot.data != null) {
-                        return Image.file(snapshot.data!, fit: BoxFit.cover);
-                      } else {
-                        return const Text('No preview available');
-                      }
-                    },
-                  ),
+          ? const CustomLoadingWidget()
+          : FutureBuilder<File?>(
+              future: cameraProvider.selectedFile,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CustomLoadingWidget();
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  return Image.file(snapshot.data!, fit: BoxFit.cover);
+                } else {
+                  return const Text('No preview available');
+                }
+              },
+            ),
           ),
-          // Albums list
-          Container(
+          SizedBox(
             height: 45,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -85,7 +85,6 @@ class _CameraGalleryScreenState extends State<CameraGalleryScreen> {
               },
             ),
           ),
-          // Gallery grid
           Expanded(
             child: cameraProvider.isLoading
           ? const CustomLoadingWidget()

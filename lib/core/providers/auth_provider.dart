@@ -57,7 +57,7 @@ class AuthProvider extends ChangeNotifier {
         (r) {
           Get.snackbar('Registration Success', 'Welcome, $username');
           Get.find<UserDataService>().userModel = r;
-          Get.off(()=>HomeScreen());
+          Get.off(()=>const HomeScreen());
         }
       );
     } on Exception catch (e) {
@@ -75,7 +75,7 @@ class AuthProvider extends ChangeNotifier {
       (result){
         Get.snackbar('Login Success', 'Welcome, $username');
         Get.find<UserDataService>().userModel = result;
-        Get.off(()=>HomeScreen());
+        Get.off(()=>const HomeScreen());
       }
     );
 

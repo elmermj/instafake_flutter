@@ -57,7 +57,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   final imagePath = await cameraProvider.savePicture(image);
                   cameraProvider.setImage(imagePath);
                 } catch (e) {
-                  print(e);
+                  Log.red(e.toString());
                 }
               },
             ),

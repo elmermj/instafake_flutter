@@ -5,7 +5,6 @@ import 'package:instafake_flutter/core/presentation/home/home_post_detail_screen
 import 'package:instafake_flutter/core/providers/home_provider.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/constants.dart';
-import 'package:instafake_flutter/widgets/caption_widget.dart';
 import 'package:instafake_flutter/widgets/empty_timeline_notice.dart';
 import 'package:instafake_flutter/widgets/post_image_widget.dart';
 import 'package:instafake_flutter/widgets/profile_handler_widget.dart';
@@ -195,7 +194,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
 
                       if(post.comments!.isNotEmpty && post.comments != null)
                       post.isCommentExpanded!
-                    ? Container(
+                    ? SizedBox(
                         width: width,
                         child: ListView.builder(
                           shrinkWrap: true,
@@ -219,7 +218,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
                           },
                         ),
                       )
-                    : Container(
+                    : SizedBox(
                         width: width,
                         child: ListView.builder(
                           shrinkWrap: true,

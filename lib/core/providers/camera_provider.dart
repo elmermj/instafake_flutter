@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
@@ -103,7 +102,7 @@ class CameraProvider extends ChangeNotifier {
       }
 
       final String newFilePath = path.join(capturesDirPath, '${DateTime.now().millisecondsSinceEpoch}.jpg');
-      final File newFile = File(newFilePath);
+      // final File newFile = File(newFilePath);
 
       final File copiedFile = await File(media.path).copy(newFilePath);
       Get.to(()=>ConfirmUploadPage(imagePath: imagePath));
@@ -112,7 +111,7 @@ class CameraProvider extends ChangeNotifier {
       notifyListeners();
       return pathToStory;
     } catch (e) {
-      print('Error saving picture: $e');
+      Log.red('Error saving picture: $e');
       return e.toString();
     }
   }

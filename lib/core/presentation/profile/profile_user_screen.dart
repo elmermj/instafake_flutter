@@ -193,7 +193,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
               ),
               itemBuilder: (context, index) {
                 final post = profileProvider.userProfile.thumbnails![index];
-                final filename = post.fileUrl.split('/').last;
+                // final filename = post.fileUrl.split('/').last;
 
                 return PostImageWidget(url: SERVER_URL + post.fileUrl, width: Get.width / 3, height: Get.width / 3);
             

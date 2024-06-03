@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class HomeExploreScreen extends StatefulWidget {
   final HomeProvider provider;
-  HomeExploreScreen({super.key, required this.provider});
+  const HomeExploreScreen({super.key, required this.provider});
 
   @override
   State<HomeExploreScreen> createState() => _HomeExploreScreenState();

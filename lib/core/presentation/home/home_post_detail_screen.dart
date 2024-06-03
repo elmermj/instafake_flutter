@@ -181,7 +181,7 @@ class _HomePostDetailScreenState extends State<HomePostDetailScreen> {
                 Expanded(
                   child: IconButton(
                     onPressed: () async {
-                      Log.yellow("${homeProvider.commentEditingController.text}");
+                      Log.yellow(homeProvider.commentEditingController.text);
                       await homeProvider.addComment(
                         homeProvider.commentEditingController.text, 
                         userData!.username, 

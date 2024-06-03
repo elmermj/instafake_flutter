@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:instafake_flutter/utils/log.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({

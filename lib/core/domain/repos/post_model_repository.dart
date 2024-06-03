@@ -37,7 +37,6 @@ class PostModelRepositoryImpl implements PostModelRepository {
   
   @override
   Future<void> deletePost(int postId) {
-    // TODO: implement deletePost
     throw UnimplementedError();
   }
   
@@ -66,7 +65,6 @@ class PostModelRepositoryImpl implements PostModelRepository {
   
   @override
   Future<Either<Exception, PostModel>> getPost(int postId) {
-    // TODO: implement getPost
     throw UnimplementedError();
   }
   
