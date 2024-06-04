@@ -54,7 +54,7 @@ class PostModel extends HiveObject {
       creatorProfPicUrl: json['creatorProfPicUrl'],
       createdAt: DateTime.parse(json['createdAt']),
       comments: CommentModel.fromJsonList(json['comments']), 
-      likeUserIds: json['likeUserIds']?.map<double>((id) => int.parse(id))?.toList() ?? [],
+      likeUserIds: json['userIdsLike']?.cast<int>() ?? [],
       isLiked: false,
       isCaptionExpanded: false,
       isCommentExpanded: false

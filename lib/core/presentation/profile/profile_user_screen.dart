@@ -2,12 +2,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
+import 'package:instafake_flutter/core/providers/home_provider.dart';
 import 'package:instafake_flutter/core/providers/profile_provider.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/constants.dart';
 import 'package:instafake_flutter/utils/log.dart';
 import 'package:instafake_flutter/widgets/custom_loading_widget.dart';
 import 'package:instafake_flutter/widgets/post_image_widget.dart';
+import 'package:instafake_flutter/widgets/profile_bar.dart';
 import 'package:instafake_flutter/widgets/profile_counts_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -128,57 +130,15 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                     ),
                     maxLines: 5,
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: profileProvider.isFollowLoading
-                  ? const CustomLoadingWidget()
-                  : profileProvider.userProfile.id == userData.id
-                      ? OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            side: BorderSide(
-                              color: Get.theme.colorScheme.onSurface.withOpacity(0.5),
-                              width: 1,
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text(
-                            "Edit Profile",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        )
-                      : SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            side: BorderSide(
-                              color: Get.theme.colorScheme.onSurface.withOpacity(0.5),
-                              width: 1,
-                            ),
-                            backgroundColor: profileProvider.userProfile.followers.contains(userData.id)? null : colorScheme.primaryContainer
-                          ),
-                          onPressed: () => profileProvider.userProfile.followers.contains(userData.id)
-                              ? profileProvider.unfollow(profileProvider.userProfile.id)
-                              : profileProvider.follow(profileProvider.userProfile.id),
-                          child: Text(
-                            profileProvider.userProfile.followers.contains(userData.id)  ? "Unfollow" : "Follow",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: profileProvider.userProfile.followers.contains(userData.id)? null : colorScheme.onSurface
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
+                  profileProvider.isFollowLoading
+                ? const CustomLoadingWidget()
+                : ProfileBar(
+                    isMe: widget.username == userData.username,
+                    isFollowed: profileProvider.userProfile.followers.contains(userData.id),
+                    follow: ()=> profileProvider.follow(profileProvider.userProfile.id),
+                    unfollow: ()=> profileProvider.unfollow(profileProvider.userProfile.id),
+                    editProfile: () => Provider.of<HomeProvider>(context).commitLogout(),
+                  )
                 ],
               ),      
             ),

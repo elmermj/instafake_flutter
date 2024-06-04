@@ -5,18 +5,20 @@ class CaptionWidget extends StatelessWidget {
   final String username;
   final String caption;
   final void Function(String) onUsernameTap;
+  final int? maxLines;
 
   const CaptionWidget({
     super.key,
     required this.username,
     required this.caption,
     required this.onUsernameTap,
+    this.maxLines
   });
 
   @override
   Widget build(BuildContext context) {
     return RichText(
-      maxLines: 3,
+      maxLines: maxLines ?? 2,
       text: TextSpan(
         children: [
           TextSpan(
@@ -26,8 +28,11 @@ class CaptionWidget extends StatelessWidget {
             ),
             recognizer: TapGestureRecognizer()..onTap = () => onUsernameTap(username),
           ),
-          TextSpan(
-            text: caption,
+          WidgetSpan(
+            child: Text(
+              caption,
+              overflow: TextOverflow.ellipsis,
+            ),
             style: const TextStyle(
               fontSize: 12,
             ),

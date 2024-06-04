@@ -31,7 +31,7 @@ class RemoteUserModelDataSource {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to login');
+      throw Exception('[${response.statusCode}] Failed to login');
     }
   }
 
@@ -65,7 +65,7 @@ class RemoteUserModelDataSource {
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Failed to login');
+        throw Exception('[${response.statusCode}] Failed to login');
       }
     }
   }
@@ -109,7 +109,7 @@ class RemoteUserModelDataSource {
       Log.red("GETTING PROFILE REMOTE DATA SOURCE ::: ${response.body.toString()}");
       return ProfileResponse.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to get profile');
+      throw Exception('[${response.statusCode}] Failed to get profile');
     }
   }
 
@@ -121,7 +121,7 @@ class RemoteUserModelDataSource {
     );
     Log.yellow("RESPONSE STATUS CODE ::: ${response.statusCode}");
     if (response.statusCode != 202) {
-      throw Exception('Failed to follow user');
+      throw Exception('[${response.statusCode}] Failed to follow user');
     }
   }
 
@@ -133,7 +133,7 @@ class RemoteUserModelDataSource {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to unfollow user');
+      throw Exception('[${response.statusCode}] Failed to unfollow user');
     }
   }
 
@@ -145,7 +145,7 @@ class RemoteUserModelDataSource {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to remove follower');
+      throw Exception('[${response.statusCode}] Failed to remove follower');
     }
   }
   

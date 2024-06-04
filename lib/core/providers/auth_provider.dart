@@ -73,8 +73,10 @@ class AuthProvider extends ChangeNotifier {
         Get.snackbar('Login Failed', result.toString());
       },
       (result){
-        Get.snackbar('Login Success', 'Welcome, $username');
+        Log.green("LOGIN SUCCESSFUL, DATA ::: ${result.toJson()}");
+        Get.snackbar('Login Success', 'Welcome, ${result.username}');
         Get.find<UserDataService>().userModel = result;
+        Log.cyan('USER DATA TOKEN FROM LOGIN ::: ${Get.find<UserDataService>().userModel!.token}');
         Get.off(()=>const HomeScreen());
       }
     );

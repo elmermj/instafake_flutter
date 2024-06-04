@@ -17,6 +17,7 @@ abstract class PostModelRepository {
 
   Future<Either<Exception, PostModel>> addComment(String comment, String username, String posId);
   Future<Either<Exception, bool>> addLike(String postId, String userId);
+  Future<Either<Exception, bool>> removeLike(String postId, String userId);
 }
 
 class PostModelRepositoryImpl implements PostModelRepository {
@@ -104,6 +105,16 @@ class PostModelRepositoryImpl implements PostModelRepository {
   Future<Either<Exception, bool>> addLike(String postId, String userId) async {
     try{
       final res = await _remoteDataSource.likePost(postId, userId);
+      return Right(res);
+    } on Exception catch (e) {
+      return Left(Exception("Timeline failed : ${e.toString()}"));
+    }
+  }
+
+  @override
+  Future<Either<Exception, bool>> removeLike(String postId, String userId) async {
+    try{
+      final res = await _remoteDataSource.unlikePost(postId, userId);
       return Right(res);
     } on Exception catch (e) {
       return Left(Exception("Timeline failed : ${e.toString()}"));

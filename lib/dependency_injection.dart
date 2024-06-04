@@ -103,9 +103,10 @@ class DependencyInjection {
 
   static requestPermissions(DeviceStatusService accountService) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if(Platform.isAndroid){
+    if(Platform.isAndroid && accountService.permissionsGranted.value==false){
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       int apiLevel = androidInfo.version.sdkInt;
+      Log.yellow("API LEVEL ::: $apiLevel");
       if(apiLevel >= 33){
         PermissionStatus storageStatus = await Permission.manageExternalStorage.request();
         PermissionStatus photosStatus = await Permission.photos.request();
@@ -128,6 +129,14 @@ class DependencyInjection {
         }else {
           accountService.permissionsGranted.value = true;
         }
+        Log.yellow("STORAGE STATUS ::: $storageStatus");
+        Log.yellow("PHOTOS STATUS ::: $photosStatus"); 
+        Log.yellow("CAMERA STATUS ::: $cameraStatus");
+        Log.yellow("VIDEO STATUS ::: $videoStatus");
+        Log.yellow("AUDIO STATUS ::: $audioStatus");
+        Log.yellow("MEDIA STATUS ::: $mediaStatus");
+        Log.yellow("MICROPHONE STATUS ::: $microphoneStatus");
+        Log.yellow("Permission STATUS ::: ${accountService.permissionsGranted.value}");
 
       } else {
         PermissionStatus externalStorageStatus = await Permission.manageExternalStorage.request();
@@ -149,7 +158,7 @@ class DependencyInjection {
     }
 
     // Not tested on IOS
-    // if(Platform.isIOS){
+    // if(Platform.isIOS && accountService.permissionsGranted.value==false){
     //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     //   if(iosInfo.systemVersion. >= '14.0'){
     //     PermissionStatus photosStatus = await Permission.photos.request();
@@ -164,7 +173,7 @@ class DependencyInjection {
   }
 
   static autoCleanCachedMedias<T>(){
-
+    
   }
 
   static bool isJwtExpired(String token) {

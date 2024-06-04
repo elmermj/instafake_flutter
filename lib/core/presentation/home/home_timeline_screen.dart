@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instafake_flutter/core/data/models/user_model.dart';
-import 'package:instafake_flutter/core/presentation/home/home_post_detail_screen.dart';
 import 'package:instafake_flutter/core/providers/home_provider.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/constants.dart';
 import 'package:instafake_flutter/widgets/empty_timeline_notice.dart';
-import 'package:instafake_flutter/widgets/post_image_widget.dart';
-import 'package:instafake_flutter/widgets/profile_handler_widget.dart';
 import 'package:instafake_flutter/widgets/story_widget.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:instafake_flutter/widgets/timeline_post_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class HomeTimelineScreen extends StatefulWidget {
   final HomeProvider provider;
@@ -27,18 +23,19 @@ class HomeTimelineScreen extends StatefulWidget {
 }
 
 class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
-  final userData = Get.find<UserDataService>().userDataBox.get(METADATA_KEY);
+  late final UserModel userData;
 
   @override
   void initState() {
     super.initState();
+    userData = Get.find<UserDataService>().userDataBox.get(METADATA_KEY)!;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<HomeProvider>(context, listen: false)
-          .getTimeline(userData!.username);
-
-      Provider.of<HomeProvider>(context, listen: false)
-          .getStories();
+      _fetchData();
     });
+  }
+
+  Future<void> _fetchData() async {
+    await widget.provider.getTimeline(userData.username);
   }
 
   @override
@@ -52,7 +49,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
 
   ? RefreshIndicator(
       onRefresh: () async =>
-          await homeProvider.getTimeline(userData!.username),
+          await homeProvider.getTimeline(userData.username),
       child: const Center(
         child: EmptyTimelineNotice(),
       ),
@@ -61,7 +58,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
 
 
   : RefreshIndicator(
-      onRefresh: () async => await homeProvider.getTimeline(userData!.username),
+      onRefresh: () async => await homeProvider.getTimeline(userData.username),
       child: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
@@ -103,157 +100,17 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
                   }
                 }
                 final post = homeProvider.posts[index];
-                bool isLiked = post.isLiked!;
+                bool isLiked = post.likeUserIds!=null? post.likeUserIds!.contains(userData.id): false;
 
-                return Container(
-                  width: width,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ProfileHandlerWidget(
-                        picUrl: post.creatorProfPicUrl,
-                        username: post.creatorUsername,
-                      ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [PostImageWidget(url: SERVER_URL + post.fileUrl, width: width, height: height),],
-                      ),
-                      SizedBox(
-                        width: width,
-                        height: 45,
-                        child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: () async => await homeProvider.addLike(post.id.toString(),userData!.id.toString(), index),
-                              icon: Icon(isLiked? Icons.favorite: Icons.favorite_border_outlined,)
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                homeProvider.currentPost = post;
-                                Get.to(() => HomePostDetailScreen(post: post,));
-                              },
-                              icon: const Icon(LucideIcons.messageCircle))
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: width,
-                        padding:const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(post.likeUserIds!.isEmpty? 'No one has liked this post': "${post.likeUserIds!.length.toString()} likes",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        width: width,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            post.isCaptionExpanded!
-                          ? Text(
-                              post.caption,
-                              style: const TextStyle(
-                                  fontSize: 16),
-                            )
-                          : Text(
-                              post.caption,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 16),
-                            ),
-                            if (post.caption.split('\n').length > 3)
-                            TextButton(
-                              onPressed: () {
-                                homeProvider.toggleCaptionExpansion(index);
-                              },
-                              child: Text(
-                                post.isCaptionExpanded!
-                                    ? "Show less"
-                                    : "Show more",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      post.comments!.length > 2
-                    ? TextButton(
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.all(0),
-                        ),
-                        onPressed: () {
-                          homeProvider.toggleCommentExpansion(index);
-                        },
-                        child: Text(post.isCommentExpanded!? "Show less": "Show ${(post.comments!.length - 2)} more comments",),
-                      )
-                    : const SizedBox.shrink(),
 
-                      if(post.comments!.isNotEmpty && post.comments != null)
-                      post.isCommentExpanded!
-                    ? SizedBox(
-                        width: width,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: post.comments!.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, commentIndex) {
-                            final comment = post.comments![commentIndex];
-                            return Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                ProfileHandlerWidget(
-                                  username: comment.author,
-                                  picUrl: comment.commenterProfPic,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  comment.comment,
-                                  textAlign: TextAlign.right,
-                                )
-                              ],
-                            );
-                          },
-                        ),
-                      )
-                    : SizedBox(
-                        width: width,
-                        child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: post.comments!.length < 2 ? 1 : 2,
-                          itemBuilder: (context, commentIndex) {
-                            final comment = post.comments![commentIndex];
-                            return Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                ProfileHandlerWidget(
-                                  username: comment.author,
-                                  picUrl: comment.commenterProfPic,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  comment.comment,
-                                  textAlign: TextAlign.right,
-                                )
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        width: width,
-                        child: Text(
-                          timeago.format(post.createdAt),
-                          textAlign: TextAlign.left,
-                        ),
-                      )
-                    ],
-                  ),
+                return TimelinePostWidget(
+                  width: width, 
+                  post: post,
+                  height: height, 
+                  homeProvider: homeProvider, 
+                  userData: userData, 
+                  isLiked: isLiked,
+                  index: index
                 );
               },
             ),
@@ -263,3 +120,4 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
     );
   }
 }
+

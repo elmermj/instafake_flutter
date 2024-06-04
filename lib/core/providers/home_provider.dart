@@ -99,7 +99,7 @@ class HomeProvider extends ChangeNotifier {
   Future<void> getTimeline(String username) async {
     _timelinePage=0;
     _posts.clear();
-    // notifyListeners();
+    notifyListeners();
     Log.yellow(_hasMore.toString());
     if (_isLoading) return;
     _isLoading = true;
@@ -302,7 +302,26 @@ class HomeProvider extends ChangeNotifier {
           _posts[index].isLiked = success;
           if(success){
             _posts[index].likeUserIds!.add(int.parse(userId));
-          } else {
+          }
+          notifyListeners();
+        }
+      );
+    } on Exception catch (e) {
+      Get.snackbar("Error","$e");
+    }
+  }
+
+  Future<void> removeLike(String postId, String userId, int index) async {
+    try {
+      final result = await _postRepo.removeLike(postId, userId);
+
+      result.fold(
+        (exception){
+          Get.snackbar("Error","$exception");
+        },
+        (success){
+          _posts[index].isLiked = success;
+          if(success){
             _posts[index].likeUserIds!.remove(int.parse(userId));
           }
           notifyListeners();

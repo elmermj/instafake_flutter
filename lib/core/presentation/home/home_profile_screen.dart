@@ -117,26 +117,60 @@ class _HomeProfileScreenState extends State<HomeProfileScreen> {
                         ),
                         maxLines: 5,
                       ),
-                      SizedBox(
+                      Container(
                         width: Get.width,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)
+                                  ),
+                                  side: BorderSide(
+                                    color: Get.theme.colorScheme.onSurface.withOpacity(0.5),
+                                    width: 1
+                                  ),
+                                ),
+                                onPressed: (){}, 
+                                child: const Text(
+                                  "Edit Profile",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12
+                                  ),
+                                )
+                              ),
                             ),
-                            side: BorderSide(
-                              color: Get.theme.colorScheme.onSurface.withOpacity(0.5),
-                              width: 1
+                            const SizedBox(width: 16,),
+                            Expanded(
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)
+                                  ),
+                                  side: BorderSide(
+                                    color: Get.theme.colorScheme.onSurface.withOpacity(0.5),
+                                    width: 1
+                                  ),
+                                  backgroundColor: Get.theme.colorScheme.error
+                                ),
+                                onPressed: (){
+                                  homeProvider.commitLogout();
+                                }, 
+                                child: const Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                )
+                              ),
                             ),
-                          ),
-                          onPressed: (){}, 
-                          child: const Text(
-                            "Edit Profile",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                            ),
-                          )
+                          ],
                         ),
                       )
                     ],

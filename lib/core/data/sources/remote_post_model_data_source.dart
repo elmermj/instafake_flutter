@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:instafake_flutter/core/data/models/post_model.dart';
 import 'package:instafake_flutter/core/data/models/post_thumbnail_model.dart';
+import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/domain/dto/comment_request.dart';
 import 'package:instafake_flutter/core/domain/dto/create_post_request.dart';
 import 'package:instafake_flutter/core/domain/dto/like_request.dart';
@@ -50,8 +52,9 @@ class RemotePostModelDataSource {
 
   Future<List<PostModel>> getTimeline(String username, int page, int pageSize) async {
     String requestURL = '${_baseUrl}api/posts/$username/timeline?page=$page&size=$pageSize';
-    Log.yellow('Get timeline Auth Token : $_token');
-    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));
+    String token = _token.isEmpty? Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)?.token ?? '' : _token;
+    Log.yellow('Get timeline Auth Token : $token');
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(token));
     Log.yellow('RESPONSE 1 ::: ${response.body}');
     Log.yellow('Get timeline response (DS) [${response.statusCode}]: ${response.body}');
     
@@ -104,7 +107,30 @@ class RemotePostModelDataSource {
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw false;
+      return false;
+    }
+  }
+
+  Future<bool> unlikePost(String postId, String userId) async {
+    String requestURL = '${_baseUrl}api/posts/$postId/unlike?userId=$userId';
+    Log.yellow('Get timeline Auth Token : $_token');
+    Log.yellow('Get requestURL : $requestURL');
+    Log.yellow('Get postId : $postId, userId : $userId');
+    final body = LikeRequest(postId: postId, userId: userId);
+    final response = await _httpClient.post(
+      Uri.parse(requestURL),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': _token
+      },
+      // body: jsonEncode(body.toJson())
+    );
+    Log.yellow('REQUEST 1 ::: ${jsonEncode(body.toJson())}');
+    Log.yellow('RESPONSE 1 ::: ${response.statusCode} ${response.body}');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
