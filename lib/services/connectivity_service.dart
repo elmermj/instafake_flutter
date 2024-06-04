@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart' as cp;
 import 'package:flutter/material.dart';
 import 'package:instafake_flutter/utils/constants.dart';
+import 'package:instafake_flutter/utils/log.dart';
 import 'package:web_socket_channel/web_socket_channel.dart' as ws;
 
 enum ConnectivityStatus { connected, disconnected }
@@ -35,12 +36,15 @@ class ConnectivityProvider extends ChangeNotifier {
     _channel = ws.WebSocketChannel.connect(Uri.parse(WEBSOCKET_URL));
 
     _channel.stream.listen((data) {
+      Log.green("Connected to websocket");
       _isConnected = true;
       notifyListeners();
     }, onError: (error) {
+      Log.red("error ::: $error");
       _isConnected = false;
       notifyListeners();
     }, onDone: () {
+      Log.pink("done");
       _isConnected = false;
       notifyListeners();
     });

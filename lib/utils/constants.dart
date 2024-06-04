@@ -1,7 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 const SERVER_URL = "http://192.168.137.1:8080/"; //OFFICE IP V4
-const WEBSOCKET_URL = "ws://192.168.137.1:8080/ws";
+const WEBSOCKET_URL = "wss://192.168.137.1:8080/ws";
 // const SERVER_URL = "http://192.168.0.103:8080/"; //HOME SERVER IP V4
 // const SERVER_URL = "http://192.168.0.1:8888/"; //HOME SERVER DEFAULT GATEWAY
 // const SERVER_URL = "http://localhost:8080/"; 
