@@ -33,10 +33,8 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
   final UserModel userData = Get.find<UserDataService>().userDataBox.get(METADATA_KEY)!;
   @override
   Widget build(BuildContext context) {
-    // final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final profileProvider = Provider.of<ProfileProvider>(context);
-    final colorScheme = Theme.of(context).colorScheme;
     Log.green("MY ID ::: ${userData.id} ||| OTHERS ID ::: ${profileProvider.userProfile.id}");
 
     return Scaffold(
