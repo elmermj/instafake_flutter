@@ -18,7 +18,7 @@ class ConnectivityProvider extends ChangeNotifier {
     cp.Connectivity().onConnectivityChanged.listen((status) {
       _getNetworkStatus(status.first);
     });
-    _connectToWSS();
+    // _connectToWSS();
   }
 
   void _getNetworkStatus(cp.ConnectivityResult status) {
