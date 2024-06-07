@@ -31,6 +31,9 @@ class UserModel extends HiveObject{
   @HiveField(8)
   DateTime createdAt;
 
+  @HiveField(9)
+  String role;
+
   UserModel({
     required this.id,
     required this.token,
@@ -41,6 +44,7 @@ class UserModel extends HiveObject{
     this.bio,
     this.fileName,
     required this.createdAt,
+    required this.role
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -54,6 +58,7 @@ class UserModel extends HiveObject{
       bio: json['bio'],
       fileName: json['fileName'],
       createdAt: DateTime.parse(json['createdAt'].replaceAll('T', ' ').substring(0, 19)),
+      role: json['role']
     );
   }
 
@@ -76,6 +81,7 @@ class UserModel extends HiveObject{
       'bio': bio,
       'fileName': fileName,
       'createdAt': createdAt.toIso8601String(),
+      'role': role
     };
   }
 }

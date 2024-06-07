@@ -66,6 +66,21 @@ class RemotePostModelDataSource {
     }
   }
 
+  Future<List<PostModel>> getAdminTimeline(int page, int pageSize) async {
+    String requestURL = '${_baseUrl}api/posts/admin/timeline?page=$page&size=$pageSize';
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    Log.yellow('Get timeline Auth Token : $token');
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(token));
+    Log.yellow('RESPONSE 1 ::: ${response.body}');
+    Log.yellow('Get timeline response (DS) [${response.statusCode}]: ${response.body}');
+    
+    if (response.statusCode == 200) {
+      return PostModel.fromJsonList(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to get timeline');
+    }
+  }
+
   Future<PostModel> addComment(String comment, String username, String posId) async {
     String requestURL = '${_baseUrl}api/posts/$posId/comment';
     String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;

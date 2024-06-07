@@ -49,6 +49,7 @@ class UserModelRepositoryImpl extends UserModelRepository{
         bio: metadata['bio'],
         // createdAt: DateFormat("yyyyMMddHHmmss").parse(metadata['created_at'])
         createdAt: DateTime.parse(metadata['createdAt']),
+        role: metadata['role'],
       );
       await _localDataSource.saveUserMetadata(authResponse);
       return Right(authResponse);
@@ -84,6 +85,7 @@ class UserModelRepositoryImpl extends UserModelRepository{
         bio: metadata['bio'],
         // createdAt: DateFormat("yyyyMMddHHmmss").parse(metadata['created_at'])
         createdAt: DateTime.parse(metadata['createdAt']),
+        role: metadata['role'],
       );
       await _localDataSource.saveUserMetadata(authResponse);
       return Right(authResponse);

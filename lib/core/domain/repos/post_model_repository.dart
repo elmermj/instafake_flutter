@@ -13,6 +13,7 @@ abstract class PostModelRepository {
   Future<Either<Exception, PostModel>> getPost(int postId);
   Future<Either<Exception, List<PostThumbnailModel>>> getExplore(int page, int pageSize);
   Future<Either<Exception, List<PostModel>>> getTimeline(String username, int page, int pageSize);
+  Future<Either<Exception, List<PostModel>>> getAdminTimeline(int page, int pageSize);
   Future<void> deletePost(int postId);
 
   Future<Either<Exception, PostModel>> addComment(String comment, String username, String posId);
@@ -116,6 +117,28 @@ class PostModelRepositoryImpl implements PostModelRepository {
     try{
       final res = await _remoteDataSource.unlikePost(postId, userId);
       return Right(res);
+    } on Exception catch (e) {
+      return Left(Exception("Timeline failed : ${e.toString()}"));
+    }
+  }
+  
+  @override
+  Future<Either<Exception, List<PostModel>>> getAdminTimeline(int page, int pageSize) async {
+    try {
+      List<PostModel> timeline = await _remoteDataSource.getAdminTimeline(page, pageSize).then((value) {
+        if (value.isNotEmpty) {
+          for (var post in value) {
+            _localDataSource.savePostMetadata(post, post.id);
+          }
+          return value;        
+        }
+        return [];
+      });
+      if (timeline.isNotEmpty) {
+        return Right(timeline);
+      } else {
+        return Left(Exception("Timeline not available"));
+      }
     } on Exception catch (e) {
       return Left(Exception("Timeline failed : ${e.toString()}"));
     }

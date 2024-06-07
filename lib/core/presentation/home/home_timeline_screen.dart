@@ -4,6 +4,7 @@ import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/providers/home_provider.dart';
 import 'package:instafake_flutter/services/user_data_service.dart';
 import 'package:instafake_flutter/utils/constants.dart';
+import 'package:instafake_flutter/utils/log.dart';
 import 'package:instafake_flutter/widgets/empty_timeline_notice.dart';
 import 'package:instafake_flutter/widgets/story_widget.dart';
 import 'package:instafake_flutter/widgets/timeline_post_widget.dart';
@@ -35,7 +36,12 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
   }
 
   Future<void> _fetchData() async {
-    await widget.provider.getTimeline(userData.username);
+    if(userData.role == 'ADMIN'){
+      Log.yellow("USER ROLE ::: ${userData.role}");
+      await widget.provider.getAdminTimeline();
+    } else {
+      await widget.provider.getTimeline(userData.username);
+    }
   }
 
   @override

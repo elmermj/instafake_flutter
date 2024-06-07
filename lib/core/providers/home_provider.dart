@@ -133,6 +133,43 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> getAdminTimeline() async {
+    _timelinePage=0;
+    _posts.clear();
+    notifyListeners();
+    Log.yellow(_hasMore.toString());
+    if (_isLoading) return;
+    _isLoading = true;
+
+    try {
+      final result = await _postRepo.getAdminTimeline(_timelinePage, _timelinePageSize);
+
+      result.fold(
+        (exception) {
+          _isLoading = false;
+          notifyListeners();
+          Get.snackbar('Error', "Admin Timeline retrieval error: $exception");
+        },
+        (posts) async {
+          _timelinePage++;
+          _hasMore = posts.length == _timelinePageSize;
+          _posts.addAll(posts);
+          for(var post in _posts){
+            isExpanded.add(false);
+          }
+          await getStories();
+          _isLoading = false;
+          Log.green(posts.length.toString());
+          notifyListeners();
+        }
+      );
+    } on Exception catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      Get.snackbar('Exception', e.toString());
+    }
+  }
+
   Future<void> getStories() async {
     _stories.clear();
 
