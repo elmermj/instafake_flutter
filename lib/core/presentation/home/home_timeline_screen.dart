@@ -55,7 +55,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
 
   ? RefreshIndicator(
       onRefresh: () async =>
-          await homeProvider.getTimeline(userData.username),
+          userData.role == 'ADMIN'? await homeProvider.getAdminTimeline(): homeProvider.getTimeline(userData.username),
       child: const Center(
         child: EmptyTimelineNotice(),
       ),
@@ -64,7 +64,7 @@ class _HomeTimelineScreenState extends State<HomeTimelineScreen> {
 
 
   : RefreshIndicator(
-      onRefresh: () async => await homeProvider.getTimeline(userData.username),
+      onRefresh: () async => userData.role == 'ADMIN'? await homeProvider.getAdminTimeline(): homeProvider.getTimeline(userData.username),
       child: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Column(
