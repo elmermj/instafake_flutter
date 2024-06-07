@@ -59,11 +59,11 @@ class DependencyInjection {
     final commentsBox = await Hive.openBox<SuggestionModel>(COMMENTS_KEY);
 
     http.Client client = http.Client();
-    String token = userBox.get(METADATA_KEY)?.token ?? '';
+    // String token = userBox.get(METADATA_KEY)?.token ?? '';
     //Data Source intances
-    Get.put<RemoteUserModelDataSource>(RemoteUserModelDataSource(client, token));
-    Get.put<RemoteStoryModelDataSource>(RemoteStoryModelDataSource(token, client));
-    Get.put<RemotePostModelDataSource>(RemotePostModelDataSource(client, SERVER_URL, token));
+    Get.put<RemoteUserModelDataSource>(RemoteUserModelDataSource(client));
+    Get.put<RemoteStoryModelDataSource>(RemoteStoryModelDataSource(client));
+    Get.put<RemotePostModelDataSource>(RemotePostModelDataSource(client, SERVER_URL));
     Get.put<LocalUserModelDataSource>(LocalUserModelDataSource(userBox, searchSuggestionsBox));
     Get.put<LocalPostModelDataSource>(LocalPostModelDataSource(postsBox, postThumbnailsBox, client));
 

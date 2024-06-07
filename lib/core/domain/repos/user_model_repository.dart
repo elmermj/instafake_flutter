@@ -10,7 +10,12 @@ import 'package:instafake_flutter/utils/log.dart';
 abstract class UserModelRepository {
   Future<Either<Exception, UserModel>> login(String username, String password);
   Future<Either<Exception, UserModel>> getLocalData();
-  Future<Either<Exception, UserModel>> register(String username, String password, String email, String realname);
+  Future<Either<Exception, UserModel>> register(
+    String realname,
+    String username,
+    String email,
+    String password,
+  );
   Future<Either<Exception, List<UserResponse>>> searchUser(String query);
   Future<void> logout();
   Future<Either<Exception, ProfileResponse>> getProfile(String username);
@@ -54,10 +59,10 @@ class UserModelRepositoryImpl extends UserModelRepository{
 
   @override
   Future<Either<Exception, UserModel>> register(
+    String realname,
     String username,
-    String password,
     String email,
-    String realname
+    String password
   ) async {
     try {
       final response = await _remoteDataSource.register(

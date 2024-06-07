@@ -14,16 +14,16 @@ import 'package:instafake_flutter/utils/log.dart';
 class RemotePostModelDataSource {
   final http.Client _httpClient;
   final String _baseUrl;
-  final String _token;
 
-  RemotePostModelDataSource(this._httpClient, this._baseUrl, this._token);
+  RemotePostModelDataSource(this._httpClient, this._baseUrl);
 
   Future<void> createPost(CreatePostRequest post, File file) async {
     var request = http.MultipartRequest('POST', Uri.parse('${_baseUrl}api/posts/create'));
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
     request.fields['username'] = post.username;
     request.fields['caption'] = post.caption;
     request.files.add(http.MultipartFile('file', file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last));
-    request.headers['Authorization'] = _token;
+    request.headers['Authorization'] = token;
     try {
       var response = await request.send();
       if (response.statusCode == 201) {
@@ -39,9 +39,10 @@ class RemotePostModelDataSource {
   Future<List<PostThumbnailModel>> getExplore(int page, int pageSize) async {
     Log.yellow("GET EXPLORE PAGE DS ::: $page, PAGE SIZE ::: $pageSize");
     String requestURL = '${_baseUrl}api/posts/explore?page=$page&size=$pageSize';
-    Log.yellow(_token);
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    Log.yellow(token);
     Log.yellow(requestURL);
-    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(_token));      
+    final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(token));
     Log.yellow("GET EXPLORE RESPONSE BODY  ::: ${response.body} [${response.statusCode}]");
     if (response.statusCode == 200) {
       return await PostThumbnailModel.fromJsonList(jsonDecode(response.body));
@@ -52,7 +53,7 @@ class RemotePostModelDataSource {
 
   Future<List<PostModel>> getTimeline(String username, int page, int pageSize) async {
     String requestURL = '${_baseUrl}api/posts/$username/timeline?page=$page&size=$pageSize';
-    String token = _token.isEmpty? Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)?.token ?? '' : _token;
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
     Log.yellow('Get timeline Auth Token : $token');
     final response = await _httpClient.post(Uri.parse(requestURL), headers: DEFAULT_HEADER(token));
     Log.yellow('RESPONSE 1 ::: ${response.body}');
@@ -67,7 +68,8 @@ class RemotePostModelDataSource {
 
   Future<PostModel> addComment(String comment, String username, String posId) async {
     String requestURL = '${_baseUrl}api/posts/$posId/comment';
-    Log.yellow('Get timeline Auth Token : $_token');
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    Log.yellow('Get timeline Auth Token : $token');
     Log.yellow('Get requestURL : $requestURL');
     final body = CommentRequest(comment: comment, username: username);
     Log.yellow('Get request body : ${body.toJson()}');
@@ -75,7 +77,7 @@ class RemotePostModelDataSource {
       Uri.parse(requestURL), 
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': _token
+        'Authorization': token
       },
       body: jsonEncode(body.toJson())
     );
@@ -90,7 +92,8 @@ class RemotePostModelDataSource {
   //Gotta rush this one
   Future<bool> likePost(String postId, String userId) async {
     String requestURL = '${_baseUrl}api/posts/$postId/like?userId=$userId';
-    Log.yellow('Get timeline Auth Token : $_token');
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    Log.yellow('Get timeline Auth Token : $token');
     Log.yellow('Get requestURL : $requestURL');
     Log.yellow('Get postId : $postId, userId : $userId');
     final body = LikeRequest(postId: postId, userId: userId);
@@ -98,7 +101,7 @@ class RemotePostModelDataSource {
       Uri.parse(requestURL),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': _token
+        'Authorization': token
       },
       // body: jsonEncode(body.toJson())
     );
@@ -113,7 +116,8 @@ class RemotePostModelDataSource {
 
   Future<bool> unlikePost(String postId, String userId) async {
     String requestURL = '${_baseUrl}api/posts/$postId/unlike?userId=$userId';
-    Log.yellow('Get timeline Auth Token : $_token');
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    Log.yellow('Get timeline Auth Token : $token');
     Log.yellow('Get requestURL : $requestURL');
     Log.yellow('Get postId : $postId, userId : $userId');
     final body = LikeRequest(postId: postId, userId: userId);
@@ -121,7 +125,7 @@ class RemotePostModelDataSource {
       Uri.parse(requestURL),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': _token
+        'Authorization': token
       },
       // body: jsonEncode(body.toJson())
     );

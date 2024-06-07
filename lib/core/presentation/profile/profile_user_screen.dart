@@ -133,8 +133,8 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                 : ProfileBar(
                     isMe: widget.username == userData.username,
                     isFollowed: profileProvider.userProfile.followers.contains(userData.id),
-                    follow: ()=> profileProvider.follow(profileProvider.userProfile.id),
-                    unfollow: ()=> profileProvider.unfollow(profileProvider.userProfile.id),
+                    follow: ()=> profileProvider.follow(userData.id),
+                    unfollow: ()=> profileProvider.unfollow(userData.id),
                     editProfile: () => Provider.of<HomeProvider>(context).commitLogout(),
                   )
                 ],
@@ -151,49 +151,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
               ),
               itemBuilder: (context, index) {
                 final post = profileProvider.userProfile.thumbnails![index];
-                // final filename = post.fileUrl.split('/').last;
-
                 return PostImageWidget(url: SERVER_URL + post.fileUrl, width: Get.width / 3, height: Get.width / 3);
-            
-                // return SizedBox(
-                //   height: Get.width / 3,
-                //   width: Get.width / 3,
-                //   child: FutureBuilder<File?>(
-                //     future: value.getFile(filename),
-                //     builder: (context, snapshot) {
-                //       Log.yellow("HomeExploreScreen: ${snapshot.connectionState}");
-                //       Log.yellow("HomeExploreScreen: ${snapshot.data?.length().toString()}");
-                //       if (snapshot.connectionState == ConnectionState.waiting) {
-                //         return const Center(child: CustomLoadingWidget());
-                //       }                  
-                //       else if (snapshot.hasError || snapshot.data == null) {
-                //         return Center(
-                //           child: Column(
-                //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //             children: [
-                //               const Icon(Icons.error),
-                //               AutoSizeText(
-                //                 '${post.postId}\n${post.caption}',
-                //                 minFontSize: 6,
-                //                 maxFontSize: 10,
-                //                 maxLines: 3,
-                //                 textAlign: TextAlign.center,
-                //               ),
-                //             ],
-                //           )
-                //         );
-                //       }
-                //       else {
-                //         return ClipRect(
-                //           child: FittedBox(
-                //             fit: BoxFit.cover,
-                //             child: MediaWidget(file: snapshot.data!)
-                //           ),
-                //         );
-                //       }
-                //     },
-                //   ),
-                // );
               },
             ),
           ]

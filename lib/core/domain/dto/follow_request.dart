@@ -9,8 +9,8 @@ class FollowRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'user': id.toString(),
-      'otherUser': otherId.toString(),
+      'id': id,
+      'otherId': otherId,
     };
   }
 }

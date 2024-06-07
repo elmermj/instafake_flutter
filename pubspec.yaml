@@ -53,6 +53,10 @@ dependencies:
   timeago: ^3.6.1
   generic_expandable_text: ^0.0.1
   web_socket_channel: 
+  new_dcdg:
+    git:
+      url: https://github.com/elmermj/new_dcdg.git
+      ref: main
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

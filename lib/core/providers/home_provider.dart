@@ -255,11 +255,11 @@ class HomeProvider extends ChangeNotifier {
       Get.snackbar('Exception', e.toString());
     }
   }
-  void _scrollListener() {
-    if (scrollController.position.pixels == scrollController.position.minScrollExtent) {
-      getMoreExplore();
-    }
-  }
+  // void _scrollListener() {
+  //   if (scrollController.position.pixels == scrollController.position.minScrollExtent) {
+  //     getMoreExplore();
+  //   }
+  // }
   void changeIndex(int input){
     _index = input;
     notifyListeners();

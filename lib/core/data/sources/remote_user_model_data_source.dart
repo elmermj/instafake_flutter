@@ -1,4 +1,6 @@
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:instafake_flutter/core/data/models/user_model.dart';
 import 'package:instafake_flutter/core/domain/dto/follow_request.dart';
 import 'package:instafake_flutter/core/domain/dto/profile_response.dart';
 import 'package:instafake_flutter/core/domain/dto/user_response.dart';
@@ -9,9 +11,8 @@ import 'package:instafake_flutter/utils/log.dart';
 
 class RemoteUserModelDataSource {
   final http.Client _client;
-  final String _token;
 
-  RemoteUserModelDataSource(this._client, this._token);
+  RemoteUserModelDataSource(this._client);
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     Log.yellow("LOGIN REMOTE DATA SOURCE INITIATED");
@@ -50,7 +51,8 @@ class RemoteUserModelDataSource {
           'username': username,
           'email': email,
           'password': password,
-          'realname': realname
+          'realname': realname,
+          'role' : 'USER'
         }),
         headers: DEFAULT_HEADER_NON_TOKEN
       ).timeout(
@@ -74,9 +76,10 @@ class RemoteUserModelDataSource {
     String query
   ) async {
     Log.yellow("REQUESTING SEARCH TO SERVER ::: ${SERVER_URL}api/users/search/$query");
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
     final response = await _client.post(
       Uri.parse('${SERVER_URL}api/users/search/$query'),
-      headers: DEFAULT_HEADER(_token)
+      headers: DEFAULT_HEADER(token)
     ).timeout(
       const Duration(
         seconds: 30
@@ -93,9 +96,10 @@ class RemoteUserModelDataSource {
     String username
   ) async {
     Log.yellow("GETTING PROFILE ::: ${SERVER_URL}profile/$username");
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
     final response = await _client.post(
       Uri.parse('${SERVER_URL}profile/$username'),
-      headers: DEFAULT_HEADER(_token)
+      headers: DEFAULT_HEADER(token)
     ).timeout(
       const Duration(
         seconds: 30
@@ -114,11 +118,21 @@ class RemoteUserModelDataSource {
   }
 
   Future<void> followUser(FollowRequest request) async {
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    final url = Uri.parse('${SERVER_URL}profile/follow');
+    final headers = DEFAULT_HEADER(token);
+    final body = json.encode(request.toJson());
+
+    Log.yellow('Request URL: $url');
+    Log.yellow('Request Headers: $headers');
+    Log.yellow('Request Body: $body');
+
     final response = await _client.post(
-      Uri.parse('${SERVER_URL}profile/follow'),
-      headers: DEFAULT_HEADER(_token),
-      body: request.toJson(),
+      url,
+      headers: headers,
+      body: body,
     );
+
     Log.yellow("RESPONSE STATUS CODE ::: ${response.statusCode}");
     if (response.statusCode != 202) {
       throw Exception('[${response.statusCode}] Failed to follow user');
@@ -126,21 +140,32 @@ class RemoteUserModelDataSource {
   }
 
   Future<void> unfollowUser(FollowRequest request) async {
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
+    final url = Uri.parse('${SERVER_URL}profile/unfollow');
+    final headers = DEFAULT_HEADER(token);
+    final body = json.encode(request.toJson());
+
+    Log.yellow('Request URL: $url');
+    Log.yellow('Request Headers: $headers');
+    Log.yellow('Request Body: $body');
+
     final response = await _client.post(
-      Uri.parse('${SERVER_URL}profile/unfollow'),
-      headers: DEFAULT_HEADER(_token),
-      body: request.toJson(),
+      url,
+      headers: headers,
+      body: body,
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('[${response.statusCode}] Failed to unfollow user');
+    Log.yellow("RESPONSE STATUS CODE ::: ${response.statusCode}");
+    if (response.statusCode != 202) {
+      throw Exception('[${response.statusCode}] Failed to follow user');
     }
   }
 
   Future<void> removeUser(FollowRequest request) async {
+    String token = Hive.box<UserModel>(METADATA_KEY).get(METADATA_KEY)!.token;
     final response = await _client.post(
       Uri.parse('${SERVER_URL}profile/removeFollower'),
-      headers: DEFAULT_HEADER(_token),
+      headers: DEFAULT_HEADER(token),
       body: request.toJson(),
     );
 

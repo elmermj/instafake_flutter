@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instafake_flutter/core/providers/auth_provider.dart';
 import 'package:instafake_flutter/utils/enums/entry_state.dart';
 import 'package:instafake_flutter/widgets/custom_card_widget.dart';
@@ -41,7 +42,7 @@ class EntryForm extends StatelessWidget {
                 children: [
                   CustomTextField(
                     labelText: "Username",
-                    controller: nameEditingController,
+                    controller: usernameEditingController,
                   ),
                   CustomTextField(
                     labelText: "Name",
@@ -83,12 +84,16 @@ class EntryForm extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
-                      value.commitEmailRegistration(
-                        nameEditingController.text,
-                        usernameEditingController.text,
-                        emailEditController.text,
-                        passwordEditController.text,
-                      );
+                      if (emailEditController.text == emailConfirmEditController.text && passwordEditController.text == passwordConfirmController.text) {
+                        value.commitEmailRegistration(
+                          nameEditingController.text,
+                          usernameEditingController.text,
+                          emailEditController.text,
+                          passwordEditController.text,
+                        );
+                      } else {
+                        Get.snackbar("Failed", "Email or password do not match");
+                      }
                     },
                     child: const Text('Register'),
                   ),

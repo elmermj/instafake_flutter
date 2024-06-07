@@ -17,6 +17,7 @@ MEDIA_DIRECTORY (String dirPath, String filename){
 
 Map<String, String> DEFAULT_HEADER(String token){
   return {
+    'Content-Type': 'application/json',
     'Authorization': token,
   };
 }
